@@ -14,7 +14,7 @@ class FieldType {
 
   // type & 8 == 8 - render a textbox.
   static const TEXT = 8;
-  static const SOMETHING = 9;
+  static const RICH = 9;
   static const EMAIL = 10;
   static const URL = 11;
 
@@ -25,6 +25,7 @@ class FieldType {
   static const MODEM = 15;
 
   static const ADDRESS = 16;
+  static const ICON = 17;
 }
 
 class RelationshipType {

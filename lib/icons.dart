@@ -30,7 +30,7 @@ class IconChooserWgtState extends State<IconChooserWgt> {
   }
 
   Widget _buildCell(int code) {
-    final alreadySaved = choice.setting == code;
+    final alreadySaved = choice.value == code;
     int test = code + (alreadySaved ? 1 : 0);
     final icon = new IconData(test, fontFamily: 'aoscontacts');
 
@@ -43,9 +43,9 @@ class IconChooserWgtState extends State<IconChooserWgt> {
         setState(() {
           parent.setState(() {
             if (alreadySaved) {
-              // choice.setting = null;
+              // choice.value = null;
             } else {
-              choice.setting = code;
+              choice.value = code;
             }
           });
         });
@@ -57,15 +57,10 @@ class IconChooserWgtState extends State<IconChooserWgt> {
 }
 
 class IconChooserWgt extends StatefulWidget {
-  final IconSetting setting;
+  final setting;
   final State<dynamic> parent;
 
   @override
   IconChooserWgtState createState() => new IconChooserWgtState(setting, this.parent);
   IconChooserWgt(this.setting, this.parent);
-}
-
-class IconSetting {
-  int setting;
-  IconSetting(this.setting);
 }
