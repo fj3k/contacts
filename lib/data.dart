@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:contacts_service/contacts_service.dart';
+import 'package:simple_permissions/simple_permissions.dart';
 
 import 'datastore.dart';
 import 'constants.dart';
-
 
 abstract class ObjectList {
   List<DataStorable> objects = [];
@@ -24,6 +24,10 @@ class People extends ObjectList {
 
   Future<int> getContacts() async {
     var start = new DateTime.now().millisecondsSinceEpoch;
+    if (!await SimplePermissions.checkPermission(Permission.ReadContacts)) {
+      var res = await SimplePermissions.requestPermission(Permission.ReadContacts);
+      if (res != PermissionStatus.authorized) return 0;
+    }
     Iterable<Contact> contacts = await ContactsService.getContacts();
     var end = new DateTime.now().millisecondsSinceEpoch;
     debugPrint("contacts fetched in ${(end - start)} milliseconds");
@@ -130,7 +134,8 @@ class PersonData extends DataStorable {
 
   Map<String, dynamic> toMap() {
     var map = <String, dynamic> {
-      'Name': name
+      'Name': name,
+      'Avatar': avatar
     };
     if (id != null) map['id'] = id;
     return map;
@@ -139,6 +144,7 @@ class PersonData extends DataStorable {
   fromMap(Map<String, dynamic> map) {
     id = map['id'];
     name = map['Name'];
+    avatar = map['Avatar'];
   }
 
   PersonData.load({int id, DataStore dataStore}) : super.load(id: id, dataStore: dataStore);

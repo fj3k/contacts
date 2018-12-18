@@ -7,14 +7,14 @@ import 'main.dart';
 import 'data.dart';
 
 class CirclesWgtState extends State<CirclesWgt> {
-  final _vips = new List<PersonData>();
+  final _vips = new List<Person>();
   final _circles = new List<CircleData>();
   final _biggerFont = const TextStyle(fontSize: 18.0);
 
   @override
   Widget build(BuildContext context) {
     if (_vips.length == 0) {
-      _vips.add(new PersonData('Me'));
+      _vips.add(new Person('Me'));
 
       _circles.add(new CircleData('Family', 0xeacb-1));
       _circles.add(new CircleData('Friends', 0xea51-1));
@@ -46,7 +46,7 @@ class CirclesWgtState extends State<CirclesWgt> {
         });
   }
 
-  Widget _buildVIPRow(PersonData person) {
+  Widget _buildVIPRow(Person person) {
     Widget leading;
     try {
       var imageProvider = new AssetImage('assets/images/acockroft.png');
@@ -59,7 +59,7 @@ class CirclesWgtState extends State<CirclesWgt> {
     return ListTile(
       leading: leading,
       title: Text(
-        person.name,
+        person.core.name,
         style: _biggerFont,
       ),
       trailing: new Icon(

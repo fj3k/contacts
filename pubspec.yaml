@@ -25,6 +25,7 @@ dependencies:
   flutter_launcher_icons: ^0.7.0
   sqflite: any
   path: any
+  simple_permissions: ^0.1.9
 
 dev_dependencies:
   flutter_test:

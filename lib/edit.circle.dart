@@ -13,10 +13,10 @@ class EditCircleWgtState extends State<EditCircleWgt> {
   @override
   Widget build(BuildContext context) {
     if (form == null) {
-      form = new AutoForm(context, this, save);
+      form = new AutoForm(context, this, save, AutoForm.EDIT);
       form.fields.addAll([
         AutoFormField('Circle name', FieldType.TEXT, circle.name),
-        AutoFormField('Icon', FieldType.ICON, circle.icon),
+        AutoFormField('Icon', FieldType.ICON, circle.icon)
       ]);
     }
     return form.build(_formKey);
