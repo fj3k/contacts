@@ -33,11 +33,36 @@ class People extends ObjectList {
     debugPrint("contacts fetched in ${(end - start)} milliseconds");
     contacts.forEach((contact) {
       List<String> name = [];
+      if (contact.prefix != null) name.add(contact.prefix);
       if (contact.givenName != null) name.add(contact.givenName);
       if (contact.middleName != null) name.add(contact.middleName);
       if (contact.familyName != null) name.add(contact.familyName);
-      // if (contact.identifier != null) name.add("(${contact.identifier})");
-      if (name.length > 0) people.add(new Person(name.join(" "), contact.avatar));
+      if (contact.suffix != null) name.add(contact.suffix);
+
+      var person = new Person(name.join(" "), contact.avatar);
+
+      contact.emails.forEach((email) {
+        var label = email.label;
+        if (label == null || label.length == 0) label = "Email";
+        person.addField(label, FieldType.EMAIL, email.value);
+      });
+
+      contact.phones.forEach((phone) {
+        var label = phone.label;
+        if (label == null || label.length == 0) label = "Phone";
+        person.addField(label, FieldType.PHONE, phone.value);
+      });
+
+      contact.postalAddresses.forEach((address) {
+        var label = address.label;
+        if (label == null || label.length == 0) label = "Address";
+        person.addField(label, FieldType.ADDRESS, address.toString());
+      });
+
+      person.addField("Job title", FieldType.TEXT, contact.jobTitle);
+      person.addField("Company", FieldType.TEXT, contact.company);
+
+      if (name.length > 0) people.add(person);
     });
     return contacts.length;
   }
@@ -105,8 +130,8 @@ class CircleData extends DataStorable {
 /// Represents a whole person
 class Person extends ComplexDataStorable {
   PersonData core;
-  List<DetailData> additional;
-  List<RelationshipData> relationships;
+  List<DetailData> additional = <DetailData>[];
+  List<RelationshipData> relationships = <RelationshipData>[];
 
   Person(name, [avatar]) {
     core = new PersonData(name, avatar);
@@ -116,6 +141,12 @@ class Person extends ComplexDataStorable {
     if (id != null) {
       core = new PersonData.load(id: id, dataStore: dataStore);
     }
+  }
+
+  addField(label, type, value) {
+    var field = DetailData(label, type, value);
+    if (field == null) return;
+    additional.add(field);
   }
 
   save({DataStore dataStore}) {
@@ -175,6 +206,7 @@ class DetailData extends DataStorable {
   }
 
   DetailData.load({int id, DataStore dataStore}) : super.load(id: id, dataStore: dataStore);
+  DetailData(this.label, this.type, [this.value]);
 }
 
 /// Represents an individual relationship entry

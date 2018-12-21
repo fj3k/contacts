@@ -5,6 +5,7 @@ import 'person.dart';
 import 'edit.circle.dart';
 import 'main.dart';
 import 'data.dart';
+import 'constants.dart';
 
 class CirclesWgtState extends State<CirclesWgt> {
   final _vips = new List<Person>();
@@ -14,7 +15,11 @@ class CirclesWgtState extends State<CirclesWgt> {
   @override
   Widget build(BuildContext context) {
     if (_vips.length == 0) {
-      _vips.add(new Person('Me'));
+      var me = new Person('Me');
+      me.addField('Phone', FieldType.PHONE, '+61405733764');
+      me.addField('Email', FieldType.EMAIL, 'andrew@fj3k.com');
+      me.addField('Website', FieldType.URL, 'https://fj3k.com');
+      _vips.add(me);
 
       _circles.add(new CircleData('Family', 0xeacb-1));
       _circles.add(new CircleData('Friends', 0xea51-1));
@@ -48,8 +53,9 @@ class CirclesWgtState extends State<CirclesWgt> {
 
   Widget _buildVIPRow(Person person) {
     Widget leading;
-    try {
+    try { //TODO: this should be more like circle.dart
       var imageProvider = new AssetImage('assets/images/acockroft.png');
+      // var imageProvider = MemoryImage(person.core.avatar);
       leading = CircleAvatar(
         backgroundImage: imageProvider
       );
@@ -68,7 +74,7 @@ class CirclesWgtState extends State<CirclesWgt> {
       onTap: () {
         Navigator.of(context).push(
           new MaterialPageRoute<void>(
-            builder: (BuildContext context) => new PersonWgt(),
+            builder: (BuildContext context) => new PersonWgt(person, true, this),
           )
         );
       },

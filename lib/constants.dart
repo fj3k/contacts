@@ -25,7 +25,8 @@ class FieldType {
   static const MODEM = 15;
 
   static const ADDRESS = 16;
-  static const ICON = 17;
+  static const IMAGE = 17;
+  static const ICON = 18;
 }
 
 class RelationshipType {

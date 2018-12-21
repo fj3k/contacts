@@ -23,28 +23,69 @@ class AutoForm {
   Widget build(_formKey) {
     List<Widget> children = <Widget> [];
 
+    var first = true;
     fields.forEach((field) {
+      if (first) {
+        first = false;
+      } else {
+        children.add(Divider());
+      }
       if (field.type & 8 == 8) {
         children.addAll(textField(field));
       } else if (field.type == FieldType.ICON) {
         children.addAll(iconChooserField(field));
+      } else if (field.type == FieldType.IMAGE) {
+        children.addAll(imageChooserField(field));
       }
     });
 
+    var buttonBar;
+    var saveButton;
     if (saveFunction != null) {
-      children.add(
-        Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: RaisedButton(
-            onPressed: () {
-              if (_formKey.currentState.validate()) {
-                debugPrint("Save: ${fields[1].value}");
-                saveFunction();
-              }
-            },
-            child: Text('Save'),
-          ),
+      var bottomButtons = <Widget>[];
+      if (false) {
+        bottomButtons.add(IconButton(
+          icon: Icon(Icons.add),
+          color: Colors.green,
+          onPressed: () {
+            if (_formKey.currentState.validate()) {
+              debugPrint("Save: ${fields[1].value}");
+              saveFunction();
+            }
+          },
+        ));
+      } else {
+        bottomButtons.add(Spacer());
+      }
+
+      bottomButtons.add(
+        IconButton(
+          icon: Icon(Icons.clear),
+          color: Colors.red,
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        )
+      );
+
+      buttonBar = BottomAppBar(
+        shape: CircularNotchedRectangle(),
+        notchMargin: 4.0,
+        child: Row(
+          mainAxisSize: MainAxisSize.max,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: bottomButtons,
         ),
+      );
+
+      saveButton = FloatingActionButton(
+        child: const Icon(Icons.check),
+        backgroundColor: Colors.green,
+        onPressed: () {
+          if (_formKey.currentState.validate()) {
+            saveFunction();
+          }
+        },
       );
     }
 
@@ -52,11 +93,16 @@ class AutoForm {
       appBar: AOSContactsApp.appBar(context),
       body: Form(
         key: _formKey,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: children,
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: children,
+          )
         ),
       ),
+      bottomNavigationBar: buttonBar,
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      floatingActionButton: saveButton,
     );
   }
 
@@ -70,28 +116,30 @@ class AutoForm {
       ),
     );
 
+    var val = deets.value == null ? '' : deets.value;
+
     if (formMode == AutoForm.VIEW) {
       var actions = <Action>[];
       switch (deets.type) {
         case FieldType.URL:
           RegExp re = new RegExp(r"^(\w+):(//.+)$", caseSensitive: false);
-          var m = re.firstMatch(deets.value);
+          var m = re.firstMatch(val);
           if (m != null) {
             actions.add(Action(m.group(1), m.group(2), Icons.open_in_browser));
           } else {
-            actions.add(Action('http', "//${deets.value}", Icons.open_in_browser));
+            actions.add(Action('http', "//$val", Icons.open_in_browser));
           }
           break;
         case FieldType.EMAIL:
-          actions.add(Action('mailto', deets.value, Icons.email));
+          actions.add(Action('mailto', val, Icons.email));
           break;
         case FieldType.PHONE:
         case FieldType.MOBILE:
         case FieldType.FAX:
         case FieldType.MODEM:
           actions.addAll([
-            Action('tel', deets.value, Icons.phone),
-            Action('sms', deets.value, Icons.sms)
+            Action('tel', val, Icons.phone),
+            Action('sms', val, Icons.sms)
           ]);
           break;
       }
@@ -99,7 +147,7 @@ class AutoForm {
       var rowWidgets = <Widget>[
         Padding(
           padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 16.0),
-          child: Text(deets.value, style: _biggerFont)
+          child: Text(val, style: _biggerFont)
         ),
       ];
 
@@ -200,6 +248,34 @@ class AutoForm {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: valueWgt,
+            ),
+          ]
+        ),
+      ),
+    ];
+  }
+
+  List<Widget> imageChooserField(AutoFormField deets) {
+    var img;
+    if (deets.value == null || deets.value.length == 0) {
+      img = CircleAvatar(
+        backgroundColor: Colors.blueGrey,
+        child: Text("Choose"),
+      );
+    } else {
+      img = CircleAvatar(
+        backgroundImage: MemoryImage(deets.value)
+      );
+    }
+    return <Widget> [
+      Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Row(
+          children: <Widget>[
+            Text('${deets.label}: ', style: _biggerFont),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: img
             ),
           ]
         ),

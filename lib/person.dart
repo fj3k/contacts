@@ -5,26 +5,45 @@ import 'form.dart';
 import 'constants.dart';
 
 class PersonWgtState extends State<PersonWgt> {
+  Person person;
   final _formKey = GlobalKey<FormState>();
   var form;
+  State<dynamic> parent;
+  final editMode;
 
   @override
   Widget build(BuildContext context) {
-    Person person = Person('Me');
+    // person = Person('Me');
     if (form == null) {
-      form = new AutoForm(context, this, null, AutoForm.VIEW);
+      form = new AutoForm(context, this, editMode ? save : null, editMode ? AutoForm.EDIT : AutoForm.VIEW);
       form.fields.addAll([
-        AutoFormField('Circle name', FieldType.TEXT, person.core.name),
-        AutoFormField('Phone', FieldType.PHONE, '+61405733764'),
-        AutoFormField('Email', FieldType.EMAIL, 'andrew@fj3k.com'),
-        AutoFormField('Website', FieldType.URL, 'https://fj3k.com/'),
+        AutoFormField('Name', FieldType.TEXT, person.core.name),
+        AutoFormField('Avatar', FieldType.IMAGE, person.core.avatar),
       ]);
+      person.additional.forEach((field) {
+        form.fields.add(AutoFormField(field.label, field.type, field.value));
+      });
     }
     return form.build(_formKey);
   }
+
+  void save() {
+    person.core.name = form.fields[0].value;
+    parent.setState(() {
+      Navigator.pop(context);
+    });
+  }
+
+  PersonWgtState(this.person, this.editMode, this.parent);
 }
 
 class PersonWgt extends StatefulWidget {
+  final Person person;
+  final editMode;
+  final State<dynamic> parent;
+
   @override
-  PersonWgtState createState() => new PersonWgtState();
+  PersonWgtState createState() => new PersonWgtState(person, editMode, parent);
+
+  PersonWgt(this.person, this.editMode, this.parent);
 }

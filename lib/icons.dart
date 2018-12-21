@@ -8,9 +8,40 @@ class IconChooserWgtState extends State<IconChooserWgt> {
 
   @override
   Widget build(BuildContext context) {
+    var buttonBar;
+    var bottomButtons = <Widget>[];
+
+    bottomButtons.add(
+      IconButton(
+        icon: Icon(IconData(choice.value, fontFamily: 'aoscontacts')),
+        onPressed: () {}, // This is just there to show what is selected.
+      )
+    );
+
+    buttonBar = BottomAppBar(
+      shape: CircularNotchedRectangle(),
+      notchMargin: 4.0,
+      child: Row(
+        mainAxisSize: MainAxisSize.max,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: bottomButtons,
+      ),
+    );
+
+    var saveButton = FloatingActionButton(
+      child: const Icon(Icons.check),
+      backgroundColor: Colors.green,
+      onPressed: () {
+        Navigator.pop(context);
+      },
+    );
+
     return Scaffold(
       appBar: AOSContactsApp.appBar(context),
       body: _buildSuggestions(),
+      bottomNavigationBar: buttonBar,
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      floatingActionButton: saveButton,
     );
   }
 
