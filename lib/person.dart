@@ -29,6 +29,7 @@ class PersonWgtState extends State<PersonWgt> {
 
   void save() {
     person.core.name = form.fields[0].value;
+    person.core.avatar = form.fields[1].value;
     parent.setState(() {
       Navigator.pop(context);
     });

@@ -26,6 +26,7 @@ dependencies:
   sqflite: any
   path: any
   simple_permissions: ^0.1.9
+  image_picker: any
 
 dev_dependencies:
   flutter_test:

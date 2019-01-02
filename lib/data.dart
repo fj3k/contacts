@@ -64,6 +64,7 @@ class People extends ObjectList {
 
       if (name.length > 0) people.add(person);
     });
+    people.sort((a, b) => a.core.name.compareTo(b.core.name));
     return contacts.length;
   }
 

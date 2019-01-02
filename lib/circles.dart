@@ -15,7 +15,7 @@ class CirclesWgtState extends State<CirclesWgt> {
   @override
   Widget build(BuildContext context) {
     if (_vips.length == 0) {
-      var me = new Person('Me');
+      var me = new Person('My details');
       me.addField('Phone', FieldType.PHONE, '+61405733764');
       me.addField('Email', FieldType.EMAIL, 'andrew@fj3k.com');
       me.addField('Website', FieldType.URL, 'https://fj3k.com');
@@ -53,14 +53,15 @@ class CirclesWgtState extends State<CirclesWgt> {
 
   Widget _buildVIPRow(Person person) {
     Widget leading;
-    try { //TODO: this should be more like circle.dart
-      var imageProvider = new AssetImage('assets/images/acockroft.png');
-      // var imageProvider = MemoryImage(person.core.avatar);
-      leading = CircleAvatar(
-        backgroundImage: imageProvider
-      );
-    } catch (Exception) {
+    if (person.core.avatar == null || person.core.avatar.length == 0) {
       leading = new Icon(Icons.person);
+    } else if (person.core.avatar is String) {
+      debugPrint(person.core.avatar);
+      leading = new Icon(Icons.error);
+    } else {
+      leading = CircleAvatar(
+        backgroundImage: MemoryImage(person.core.avatar)
+      );
     }
     return ListTile(
       leading: leading,

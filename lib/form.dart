@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart' as UrlLauncher;
+import 'package:image_picker/image_picker.dart';
 
 import 'main.dart';
 import 'icons.dart';
@@ -10,6 +11,9 @@ class AutoForm {
   static const VIEW = 1;
   static const EDIT = 2;
   static const READONLY = 3;
+
+  static bool canLibrary = true;
+  static bool canCamera = true;
 
   final fields = List<AutoFormField>();
   final context;
@@ -256,31 +260,98 @@ class AutoForm {
   }
 
   List<Widget> imageChooserField(AutoFormField deets) {
+    var widgets = <Widget>[];
+
+    widgets.add(
+      Padding(
+        padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 0.0),
+        child: Text('${deets.label}:', style: _biggerFont),
+      ),
+    );
+
     var img;
-    if (deets.value == null || deets.value.length == 0) {
+    if (deets.value == null) {
       img = CircleAvatar(
         backgroundColor: Colors.blueGrey,
-        child: Text("Choose"),
+        child: Icon(Icons.person),
       );
     } else {
       img = CircleAvatar(
         backgroundImage: MemoryImage(deets.value)
       );
     }
-    return <Widget> [
+
+    var rowWidgets = <Widget>[
       Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Row(
-          children: <Widget>[
-            Text('${deets.label}: ', style: _biggerFont),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: img
-            ),
-          ]
-        ),
+        padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 16.0),
+        child: img
       ),
     ];
+
+    if (formMode == AutoForm.EDIT) {
+      var buttons = <Widget>[];
+
+      if (canCamera) {
+        buttons.add(
+          Padding(
+            padding: const EdgeInsets.all(1.0),
+            child: MaterialButton(
+              height: 40.0,
+              minWidth: 40.0,
+              elevation: 0,
+              color: Theme.of(context).buttonColor,
+              onPressed: () async {
+                var imageData = await ImagePicker.pickImage(source: ImageSource.camera);
+                if (imageData != null) {
+                  parent.setState(() {
+                    deets.value = imageData.readAsBytesSync();
+                  });
+                }
+              },
+              child: Icon(Icons.add_a_photo),
+            )
+          )
+        );
+      }
+      if (canLibrary) {
+        buttons.add(
+          Padding(
+            padding: const EdgeInsets.all(1.0),
+            child: MaterialButton(
+              height: 40.0,
+              minWidth: 40.0,
+              elevation: 0,
+              color: Theme.of(context).buttonColor,
+              onPressed: () async {
+                var imageData = await ImagePicker.pickImage(source: ImageSource.gallery);
+                if (imageData != null) {
+                  parent.setState(() {
+                    deets.value = imageData.readAsBytesSync();
+                  });
+                }
+              },
+              child: Icon(Icons.photo),
+            )
+          )
+        );
+      }
+      rowWidgets.add(Expanded(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 15.0),
+          child: Row(
+            children: buttons,
+            mainAxisAlignment: MainAxisAlignment.end
+          )
+        )
+      ));
+    }
+    widgets.add(
+      Row(
+        children: rowWidgets,
+      )
+    );
+
+    return widgets;
   }
 }
 
