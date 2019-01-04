@@ -21,6 +21,7 @@ class Circles extends ObjectList {
 class People extends ObjectList {
   static final People _singleton = new People._internal();
   final List<Person> people = new List<Person>();
+  final Map<dynamic, Person> byPhoneID = new Map<dynamic, Person>();
 
   Future<int> getContacts() async {
     var start = new DateTime.now().millisecondsSinceEpoch;
@@ -32,6 +33,9 @@ class People extends ObjectList {
     var end = new DateTime.now().millisecondsSinceEpoch;
     debugPrint("contacts fetched in ${(end - start)} milliseconds");
     contacts.forEach((contact) {
+      if (byPhoneID.containsKey(contact.identifier)) {
+        return;
+      }
       List<String> name = [];
       if (contact.prefix != null) name.add(contact.prefix);
       if (contact.givenName != null) name.add(contact.givenName);
@@ -40,6 +44,7 @@ class People extends ObjectList {
       if (contact.suffix != null) name.add(contact.suffix);
 
       var person = new Person(name.join(" "), contact.avatar);
+      person.core.phoneID = contact.identifier;
 
       contact.emails.forEach((email) {
         var label = email.label;
@@ -62,7 +67,10 @@ class People extends ObjectList {
       person.addField("Job title", FieldType.TEXT, contact.jobTitle);
       person.addField("Company", FieldType.TEXT, contact.company);
 
-      if (name.length > 0) people.add(person);
+      if (name.length > 0) {
+        people.add(person);
+        byPhoneID[contact.identifier] = person;
+      }
     });
     people.sort((a, b) => a.core.name.compareTo(b.core.name));
     return contacts.length;
@@ -162,6 +170,7 @@ class Person extends ComplexDataStorable {
 class PersonData extends DataStorable {
   final DatabaseTable table = new PeopleTable();
   int id;
+  String phoneID;
   String name;
   var avatar;
 
