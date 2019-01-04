@@ -15,20 +15,31 @@ class AutoForm {
   static bool canLibrary = true;
   static bool canCamera = true;
 
-  final fields = List<AutoFormField>();
+  final fields = Map<dynamic, AutoFormField>();
   final context;
   final State<dynamic> parent;
   final _biggerFont = const TextStyle(fontSize: 18.0);
   final saveFunction;
   final formMode;
+  TextEditingController _labelController;
 
   AutoForm(this.context, this.parent, this.saveFunction, this.formMode);
+
+  void addFields(List<AutoFormField> newFields) => newFields.forEach((field) {
+    if (!addField(field)) return false;
+  });
+
+  bool addField(AutoFormField field) {
+    if (fields.containsKey(field.id)) return false;
+    fields[field.id] = field;
+    return true;
+  }
 
   Widget build(_formKey) {
     List<Widget> children = <Widget> [];
 
     var first = true;
-    fields.forEach((field) {
+    fields.forEach((id, field) {
       if (first) {
         first = false;
       } else {
@@ -110,13 +121,50 @@ class AutoForm {
     );
   }
 
+  Widget fieldLabel(AutoFormField deets) {
+    return InkWell(
+      child: Text(deets.label, style: _biggerFont),
+      onLongPress: () {
+        _labelController = new TextEditingController(text: deets.label);
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              actions: <Widget>[
+                FlatButton(
+                  child: Text('Close'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                )
+              ],
+              title: Text('Edit label'),
+              content: TextField(
+                controller: _labelController,
+                onChanged: (value) {
+                  if (value.isEmpty) {
+                    debugPrint('Please enter a label');
+                  }
+                  parent.setState(() {
+                    deets.label = value;
+                    debugPrint(deets.label);
+                  });
+                },
+              )
+            );
+          }
+        );
+      },
+    );
+  }
+
   List<Widget> textField(AutoFormField deets) {
     var widgets = <Widget>[];
 
     widgets.add(
       Padding(
         padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 0.0),
-        child: Text('${deets.label}:', style: _biggerFont),
+        child: fieldLabel(deets),
       ),
     );
 
@@ -248,7 +296,7 @@ class AutoForm {
         padding: const EdgeInsets.all(16.0),
         child: Row(
           children: <Widget>[
-            Text('${deets.label}: ', style: _biggerFont),
+            fieldLabel(deets),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: valueWgt,
@@ -265,12 +313,12 @@ class AutoForm {
     widgets.add(
       Padding(
         padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 0.0),
-        child: Text('${deets.label}:', style: _biggerFont),
+        child: fieldLabel(deets),
       ),
     );
 
     var img;
-    if (deets.value == null) {
+    if (deets.value == null || deets.value.length == 0) {
       img = CircleAvatar(
         backgroundColor: Colors.blueGrey,
         child: Icon(Icons.person),
@@ -356,11 +404,13 @@ class AutoForm {
 }
 
 class AutoFormField {
-  final label;
+  static var defaultID = 0;
+  final id;
+  var label;
   final type;
   var value;
 
-  AutoFormField(this.label, this.type, this.value);
+  AutoFormField(this.label, this.type, this.value, [aid]) : id = (aid != null) ? aid : AutoFormField.defaultID++;
 }
 
 class Action {

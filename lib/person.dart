@@ -13,23 +13,26 @@ class PersonWgtState extends State<PersonWgt> {
 
   @override
   Widget build(BuildContext context) {
-    // person = Person('Me');
     if (form == null) {
       form = new AutoForm(context, this, editMode ? save : null, editMode ? AutoForm.EDIT : AutoForm.VIEW);
-      form.fields.addAll([
-        AutoFormField('Name', FieldType.TEXT, person.core.name),
-        AutoFormField('Avatar', FieldType.IMAGE, person.core.avatar),
+      form.addFields([
+        AutoFormField('Name', FieldType.TEXT, person.core.name, 'C-Name'),
+        AutoFormField('Avatar', FieldType.IMAGE, person.core.avatar, 'C-Avatar'),
       ]);
-      person.additional.forEach((field) {
-        form.fields.add(AutoFormField(field.label, field.type, field.value));
+      person.additional.forEach((id, field) {
+        form.addField(AutoFormField(field.label, field.type, field.value, id)); //This should specify the ID (4th parameter)
       });
     }
     return form.build(_formKey);
   }
 
   void save() {
-    person.core.name = form.fields[0].value;
-    person.core.avatar = form.fields[1].value;
+    person.core.name = form.fields['C-Name'].value;
+    person.core.avatar = form.fields['C-Avatar'].value;
+    person.additional.forEach((id, field) {
+      field.label = form.fields[id].label;
+      field.value = form.fields[id].value;
+    });
     parent.setState(() {
       Navigator.pop(context);
     });

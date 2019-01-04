@@ -131,7 +131,7 @@ class CircleData extends DataStorable {
 /// Represents a whole person
 class Person extends ComplexDataStorable {
   PersonData core;
-  List<DetailData> additional = <DetailData>[];
+  Map<String, DetailData> additional = <String, DetailData>{};
   List<RelationshipData> relationships = <RelationshipData>[];
 
   Person(name, [avatar]) {
@@ -147,7 +147,8 @@ class Person extends ComplexDataStorable {
   addField(label, type, value) {
     var field = DetailData(label, type, value);
     if (field == null) return;
-    additional.add(field);
+    var id = 'N-${additional.length}';
+    additional[id] = field;
   }
 
   save({DataStore dataStore}) {

@@ -55,6 +55,13 @@ class CircleWgtState extends State<CircleWgt> {
           )
         );
       },
+      onLongPress: () {
+        Navigator.of(context).push(
+          new MaterialPageRoute<void>(
+            builder: (BuildContext context) => new PersonWgt(deets, true, this),
+          )
+        );
+      },
     );
   }
 }
